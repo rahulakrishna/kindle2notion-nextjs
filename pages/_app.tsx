@@ -1,8 +1,16 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import "../styles/globals.css";
+import "semantic-ui-css/semantic.min.css";
+import type { AppProps } from "next/app";
+import { Container } from "semantic-ui-react";
+import Navbar from "./navbar";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  return (
+    <Container style={{ paddingTop: "16px" }}>
+      <Navbar />
+      <Component {...pageProps} />
+    </Container>
+  );
 }
 
-export default MyApp
+export default MyApp;
