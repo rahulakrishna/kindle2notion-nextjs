@@ -1,8 +1,7 @@
 import styled from "styled-components";
 
 export const Form = styled.form`
-  .input,
-  button {
+  .input {
     margin-bottom: 16px;
   }
 `;
