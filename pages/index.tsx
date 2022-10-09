@@ -26,11 +26,17 @@ type CleanedClipping = {
   clippings: Array<string>;
 };
 
+type ClippingsResult = {
+  loading: boolean;
+  error: boolean | string;
+  data: Array<CleanedClipping>;
+};
+
 const Home: NextPage = () => {
   const [notionApiAuthToken, setNotionApiAuthToken] = useState("");
   const [notionDatabaseID, setNotionDatabaseID] = useState("");
-  const [clippingsFile, setClippingsFile] = useState(null);
-  const [result, setResult] = useState({
+  const [clippingsFile, setClippingsFile] = useState<any | null>(null);
+  const [result, setResult] = useState<ClippingsResult>({
     data: [],
     error: false,
     loading: false,
@@ -97,12 +103,14 @@ const Home: NextPage = () => {
           type="file"
           fluid
           onChange={(e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.readAsText(file);
-            reader.onload = () => {
-              setClippingsFile(reader.result);
-            };
+            if (e.target.files) {
+              const file = e.target.files[0];
+              const reader = new FileReader();
+              reader.readAsText(file);
+              reader.onload = () => {
+                setClippingsFile(reader.result);
+              };
+            }
           }}
         />
         <Button
@@ -121,17 +129,19 @@ const Home: NextPage = () => {
         <Grid columns={1} style={{ width: "100%" }}>
           {result.data.map((clipping: CleanedClipping, index) => {
             return (
-              <Grid.Column style={{ marginLeft: "0px", marginRight: "0px" }}>
+              <Grid.Column
+                style={{ marginLeft: "0px", marginRight: "0px" }}
+                key={index}
+              >
                 <Card
                   fluid
-                  key={index}
                   header={clipping.title}
                   meta={clipping.author}
                   description={() => (
                     <div>
                       <ol>
-                        {clipping.clippings.map((c) => (
-                          <li>
+                        {clipping.clippings.map((c, i) => (
+                          <li key={i}>
                             <Message>{c}</Message>
                           </li>
                         ))}
