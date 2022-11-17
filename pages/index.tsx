@@ -1,39 +1,13 @@
 import { SyntheticEvent, useEffect, useState } from "react";
-import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import {
-  Input,
-  Button,
-  Card,
-  Grid,
-  Message,
-  Statistic,
-  Accordion,
-  Icon,
-  Step,
-} from "semantic-ui-react";
-import { Form } from "../styles/form.styles";
+import { Step } from "semantic-ui-react";
 
-type Clipping = {
-  title: string;
-  author: string;
-  body: string;
-};
+import ValidateForm from "./validate-form";
+import SubmitForm from "./submit-form";
 
-type CleanedClipping = {
-  title: string;
-  author: string;
-  clippings: Array<string>;
-};
-
-type ClippingsResult = {
-  loading: boolean;
-  error: boolean | string;
-  data: Array<CleanedClipping>;
-};
+import { ClippingsResult } from "./types";
 
 const Home: NextPage = () => {
   const [notionApiAuthToken, setNotionApiAuthToken] = useState("");
@@ -86,163 +60,29 @@ const Home: NextPage = () => {
         </Step>
       </Step.Group>
       {activeStep === 0 && (
-        <Form
-          onSubmit={(e: SyntheticEvent) => {
-            e.preventDefault();
-            localStorage.setItem("notionApiAuthToken", notionApiAuthToken);
-            localStorage.setItem("notionDatabaseId", notionDatabaseID);
-            setResult({
-              data: [],
-              error: false,
-              loading: true,
-            });
-
-            axios({
-              method: "post",
-              url: "api/validate-clippings",
-              data: {
-                notionApiAuthToken,
-                notionDatabaseID,
-                clippingsFile,
-              },
-            })
-              .then(({ data }) => {
-                console.log({ data });
-                setResult({
-                  data: data.cleanedClippings,
-                  error: false,
-                  loading: false,
-                });
-                setActiveStep(1);
-              })
-              .catch((e) => {
-                setResult({
-                  data: [],
-                  error: true,
-                  loading: false,
-                });
-              });
-          }}
-        >
-          <Input
-            fluid
-            type="text"
-            size="large"
-            placeholder="Notion Token"
-            value={notionApiAuthToken}
-            onChange={(e) => setNotionApiAuthToken(e.target.value)}
-          />
-          <br />
-          <Input
-            fluid
-            type="text"
-            size="large"
-            placeholder="Page ID"
-            value={notionDatabaseID}
-            onChange={(e) => setNotionDatabaseID(e.target.value)}
-          />
-          <br />
-          <Input
-            type="file"
-            fluid
-            onChange={(e) => {
-              if (e.target.files) {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.readAsText(file);
-                reader.onload = () => {
-                  setClippingsFile(reader.result);
-                };
-              }
-            }}
-          />
-          <br />
-          <br />
-          <Button
-            fluid
-            primary
-            type="submit"
-            disabled={
-              !notionApiAuthToken || !notionDatabaseID || !clippingsFile
-            }
-            loading={result.loading}
-          >
-            Submit
-          </Button>
-        </Form>
+        <ValidateForm
+          notionApiAuthToken={notionApiAuthToken}
+          setNotionApiAuthToken={setNotionApiAuthToken}
+          notionDatabaseID={notionDatabaseID}
+          setNotionDatabaseID={setNotionDatabaseID}
+          setResult={setResult}
+          clippingsFile={clippingsFile}
+          setClippingsFile={setClippingsFile}
+          setActiveStep={setActiveStep}
+          resultLoading={result.loading}
+        />
       )}
       {result.error && "Error..."}
       {result.data.length > 0 && <div>Total {result.data.length} books</div>}
       {activeStep === 1 && (
-        <div style={{ marginTop: "32px", width: "100%" }}>
-          <Grid columns={1} style={{ width: "100%" }}>
-            {result.data.map((clipping: CleanedClipping, index) => {
-              return (
-                <Grid.Column
-                  style={{ marginLeft: "0px", marginRight: "0px" }}
-                  key={index}
-                >
-                  <Card
-                    fluid
-                    header={clipping.title}
-                    meta={clipping.author}
-                    description={() => (
-                      <div>
-                        <Accordion>
-                          <Accordion.Title
-                            active={activeIndex === index}
-                            index={index}
-                            onClick={expandAccordion}
-                          >
-                            <Icon name="dropdown" />
-                            {clipping.clippings.length} clippings
-                          </Accordion.Title>
-                          <Accordion.Content active={activeIndex === index}>
-                            <ol>
-                              {clipping.clippings.map((c, i) => (
-                                <li key={i}>
-                                  <Message>{c}</Message>
-                                </li>
-                              ))}
-                            </ol>
-                          </Accordion.Content>
-                        </Accordion>
-                      </div>
-                    )}
-                  />
-                </Grid.Column>
-              );
-            })}
-          </Grid>
-          <Grid style={{ marginBottom: "32px" }}>
-            <Button
-              fluid
-              primary
-              onClick={() => {
-                axios({
-                  method: "post",
-                  url: "api/submit-clippings",
-                  data: {
-                    notionApiAuthToken,
-                    notionDatabaseID,
-                    books: result.data,
-                  },
-                })
-                  .then(({ data }) => {
-                    console.log({ data });
-                  })
-                  .catch((e) => {
-                    console.error(e);
-                  });
-              }}
-            >
-              Upload to Notion
-            </Button>
-            <br />
-            <br />
-            <br />
-          </Grid>
-        </div>
+        <SubmitForm
+          clippings={result.data}
+          activeIndex={activeIndex}
+          expandAccordion={expandAccordion}
+          notionApiAuthToken={notionApiAuthToken}
+          notionDatabaseID={notionDatabaseID}
+          books={result.data}
+        />
       )}
     </div>
   );
