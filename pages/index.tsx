@@ -36,6 +36,7 @@ const Home: NextPage = () => {
     setActiveIndex(newIndex);
   };
   const [activeStep, setActiveStep] = useState(0);
+  const [completed, setCompleted] = useState<boolean>(false);
   return (
     <div className={styles.container}>
       <Head>
@@ -52,7 +53,7 @@ const Home: NextPage = () => {
             </Step.Description>
           </Step.Content>
         </Step>
-        <Step active={activeStep === 1}>
+        <Step active={activeStep === 1} completed={completed}>
           <Step.Content>
             <Step.Title>Review & Submit</Step.Title>
             <Step.Description>Your Clippings to Notion</Step.Description>
@@ -82,6 +83,7 @@ const Home: NextPage = () => {
           notionApiAuthToken={notionApiAuthToken}
           notionDatabaseID={notionDatabaseID}
           books={result.data}
+          setCompleted={setCompleted}
         />
       )}
     </div>

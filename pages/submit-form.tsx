@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Key } from "react";
+import { useState, Key } from "react";
 import {
   Button,
   Card,
@@ -18,6 +18,7 @@ type Props = {
   notionApiAuthToken: string;
   notionDatabaseID: string;
   books: CleanedClipping[];
+  setCompleted: Function;
 };
 
 const SubmitForm = ({
@@ -27,7 +28,10 @@ const SubmitForm = ({
   notionApiAuthToken,
   notionDatabaseID,
   books,
+  setCompleted,
 }: Props) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   return (
     <div style={{ marginTop: "32px", width: "100%" }}>
       <Grid columns={1} style={{ width: "100%" }}>
@@ -72,8 +76,12 @@ const SubmitForm = ({
       <Grid style={{ marginBottom: "32px" }}>
         <Button
           fluid
-          primary
+          primary={!submitted}
+          positive={submitted}
+          disabled={!(!submitted && !submitting)}
+          loading={submitting}
           onClick={() => {
+            setSubmitting(true);
             axios({
               method: "post",
               url: "api/submit-clippings",
@@ -84,14 +92,19 @@ const SubmitForm = ({
               },
             })
               .then(({ data }) => {
+                setCompleted(true);
                 console.log({ data });
+                setSubmitted(true);
               })
               .catch((e) => {
                 console.error(e);
+              })
+              .finally(() => {
+                setSubmitting(false);
               });
           }}
         >
-          Upload to Notion
+          {!submitted ? "Upload to Notion" : "Done!"}
         </Button>
         <br />
         <br />
