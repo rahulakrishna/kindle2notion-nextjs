@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, Key } from "react";
+import { SyntheticEvent, useState, Key } from "react";
 import {
   Button,
   Card,
@@ -13,8 +13,6 @@ import { CleanedClipping } from "./types";
 
 type Props = {
   clippings: CleanedClipping[];
-  activeIndex: Key | null;
-  expandAccordion: Function;
   notionApiAuthToken: string;
   notionDatabaseID: string;
   books: CleanedClipping[];
@@ -23,8 +21,6 @@ type Props = {
 
 const SubmitForm = ({
   clippings,
-  activeIndex,
-  expandAccordion,
   notionApiAuthToken,
   notionDatabaseID,
   books,
@@ -32,6 +28,13 @@ const SubmitForm = ({
 }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(null);
+  const expandAccordion = (e: SyntheticEvent, titleProps: any) => {
+    console.log(e, titleProps);
+    const { index } = titleProps;
+    const newIndex = activeIndex === index ? -1 : index;
+    setActiveIndex(newIndex);
+  };
   return (
     <div style={{ marginTop: "32px", width: "100%" }}>
       <Grid columns={1} style={{ width: "100%" }}>
@@ -51,7 +54,7 @@ const SubmitForm = ({
                       <Accordion.Title
                         active={activeIndex === index}
                         index={index}
-                        onClick={() => expandAccordion()}
+                        onClick={expandAccordion}
                       >
                         <Icon name="dropdown" />
                         {clipping.clippings.length} clippings

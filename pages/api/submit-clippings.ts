@@ -18,10 +18,10 @@ type Book = {
 
 const prepareAggregrateTextForOneBook = (book: Book) => {
   const aggregratedText = book.clippings.reduce(
-    (acc: string, clipping: string) => {
-      return `${acc} ${clipping}\n\n`;
+    (acc: string[], clipping: string) => {
+      return [...acc, clipping];
     },
-    ""
+    []
   );
 
   return aggregratedText;
@@ -32,7 +32,7 @@ type AddBookToNotionArgs = {
   notionDatabaseID: string;
   title: string;
   author: string;
-  aggregrateText: string;
+  aggregrateText: string[];
 };
 
 const addBookToNotion = async ({
@@ -67,20 +67,18 @@ const addBookToNotion = async ({
         ],
       },
     },
-    children: [
-      {
-        object: "block",
-        paragraph: {
-          rich_text: [
-            {
-              text: {
-                content: aggregrateText,
-              },
+    children: aggregrateText.map((text: string) => ({
+      object: "block",
+      paragraph: {
+        rich_text: [
+          {
+            text: {
+              content: text,
             },
-          ],
-        },
+          },
+        ],
       },
-    ],
+    })),
   });
   return response;
 };

@@ -29,12 +29,7 @@ const Home: NextPage = () => {
     error: false,
     loading: false,
   });
-  const [activeIndex, setActiveIndex] = useState(null);
-  const expandAccordion = (e: SyntheticEvent, titleProps: any) => {
-    const { index } = titleProps;
-    const newIndex = activeIndex === index ? -1 : index;
-    setActiveIndex(newIndex);
-  };
+
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<boolean>(false);
   return (
@@ -78,8 +73,6 @@ const Home: NextPage = () => {
       {activeStep === 1 && (
         <SubmitForm
           clippings={result.data}
-          activeIndex={activeIndex}
-          expandAccordion={expandAccordion}
           notionApiAuthToken={notionApiAuthToken}
           notionDatabaseID={notionDatabaseID}
           books={result.data}
