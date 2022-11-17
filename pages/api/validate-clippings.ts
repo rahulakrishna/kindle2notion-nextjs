@@ -70,12 +70,12 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const { notionApiAuthToken, notionDatabaseID, clippingsFile } = req.body;
-  console.log({ clippingsFile });
+
   const clippingsArray = clippingsFile
     .split("==========")
     .map((s: string) => {
       const { title, author } = getTitleAndAuthor(s.split("\n")[1]);
-      console.log({ slug: s, newlinesplit: s.split("\n") });
+
       const content = s.split("\n")[4];
       return {
         title,
@@ -87,8 +87,6 @@ export default async function handler(
     .filter((c: Clipping) => !!c.body && c.body !== "");
 
   const cleanedClippings = await convertClippingsArrayToObject(clippingsArray);
-
-  console.log({ cleanedClippings });
 
   res.status(200).json({
     name: "John Doe",

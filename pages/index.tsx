@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -38,6 +38,17 @@ type ClippingsResult = {
 const Home: NextPage = () => {
   const [notionApiAuthToken, setNotionApiAuthToken] = useState("");
   const [notionDatabaseID, setNotionDatabaseID] = useState("");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const authTokenFromLocalStorage =
+        localStorage.getItem("notionApiAuthToken");
+      const databaseIdFromLocalStorage =
+        localStorage.getItem("notionDatabaseId");
+
+      setNotionApiAuthToken(authTokenFromLocalStorage || "");
+      setNotionDatabaseID(databaseIdFromLocalStorage || "");
+    }
+  }, []);
   const [clippingsFile, setClippingsFile] = useState<any | null>(null);
   const [result, setResult] = useState<ClippingsResult>({
     data: [],
@@ -45,7 +56,7 @@ const Home: NextPage = () => {
     loading: false,
   });
   const [activeIndex, setActiveIndex] = useState(null);
-  const expandAccordion = (e, titleProps) => {
+  const expandAccordion = (e: SyntheticEvent, titleProps: any) => {
     const { index } = titleProps;
     const newIndex = activeIndex === index ? -1 : index;
     setActiveIndex(newIndex);
@@ -78,6 +89,8 @@ const Home: NextPage = () => {
         <Form
           onSubmit={(e: SyntheticEvent) => {
             e.preventDefault();
+            localStorage.setItem("notionApiAuthToken", notionApiAuthToken);
+            localStorage.setItem("notionDatabaseId", notionDatabaseID);
             setResult({
               data: [],
               error: false,
@@ -212,6 +225,7 @@ const Home: NextPage = () => {
                   data: {
                     notionApiAuthToken,
                     notionDatabaseID,
+                    books: result.data,
                   },
                 })
                   .then(({ data }) => {
