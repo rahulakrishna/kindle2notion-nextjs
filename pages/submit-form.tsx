@@ -51,41 +51,43 @@ const SubmitForm = ({
               key={index}
             >
               <Card>
-                {console.log({ c: clipping.coverImage })}
-                {clipping.coverImage && clipping.coverImage !== "" && (
-                  <Image
-                    src={clipping.coverImage.thumbnail}
-                    wrapped
-                    ui={false}
-                  />
-                )}
-                <Card.Content>
-                  <Card.Header>{clipping.title}</Card.Header>
-                  <Card.Meta>{clipping.author}</Card.Meta>
-                  <Card.Description>
-                    <div>
-                      <Accordion>
-                        <Accordion.Title
-                          active={activeIndex === index}
-                          index={index}
-                          onClick={expandAccordion}
-                        >
-                          <Icon name="dropdown" />
-                          {clipping.clippings.length} clippings
-                        </Accordion.Title>
-                        <Accordion.Content active={activeIndex === index}>
-                          <ol>
-                            {clipping.clippings.map((c, i) => (
-                              <li key={i}>
-                                <Message>{c}</Message>
-                              </li>
-                            ))}
-                          </ol>
-                        </Accordion.Content>
-                      </Accordion>
-                    </div>
-                  </Card.Description>
-                </Card.Content>
+                <>
+                  {clipping.coverImage && clipping.coverImage && (
+                    <Image
+                      alt="book cover"
+                      src={clipping.coverImage.thumbnail}
+                      wrapped
+                      ui={false}
+                    />
+                  )}
+                  <Card.Content>
+                    <Card.Header>{clipping.title}</Card.Header>
+                    <Card.Meta>{clipping.author}</Card.Meta>
+                    <Card.Description>
+                      <div>
+                        <Accordion>
+                          <Accordion.Title
+                            active={activeIndex === index}
+                            index={index}
+                            onClick={expandAccordion}
+                          >
+                            <Icon name="dropdown" />
+                            {clipping.clippings.length} clippings
+                          </Accordion.Title>
+                          <Accordion.Content active={activeIndex === index}>
+                            <ol>
+                              {clipping.clippings.map((c, i) => (
+                                <li key={i}>
+                                  <Message>{c}</Message>
+                                </li>
+                              ))}
+                            </ol>
+                          </Accordion.Content>
+                        </Accordion>
+                      </div>
+                    </Card.Description>
+                  </Card.Content>
+                </>
               </Card>
             </Grid.Column>
           );

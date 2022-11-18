@@ -4,11 +4,16 @@ export type Clipping = {
   body: string;
 };
 
+type Thumbnail = {
+  smallThumbnail: string;
+  thumbnail: string;
+};
+
 export type CleanedClipping = {
   title: string;
   author: string;
   clippings: Array<string>;
-  coverImage: string | { smallThumbnail: string; thumbnail: string };
+  coverImage: Thumbnail | undefined;
 };
 
 export type ClippingsResult = {

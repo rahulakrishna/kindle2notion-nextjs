@@ -133,7 +133,7 @@ export default async function handler(
     const coverImage =
       googleBooksResponse.data.totalItems > 0
         ? googleBooksResponse.data.items[0].volumeInfo.imageLinks
-        : "";
+        : undefined;
     const authorFromGoogleBooks =
       googleBooksResponse.data.totalItems > 0
         ? googleBooksResponse.data.items[0].volumeInfo.authors[0]
