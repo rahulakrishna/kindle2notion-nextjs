@@ -3,6 +3,7 @@ import { SyntheticEvent, useState, Key } from "react";
 import {
   Button,
   Card,
+  Image,
   Grid,
   Message,
   Accordion,
@@ -26,6 +27,7 @@ const SubmitForm = ({
   books,
   setCompleted,
 }: Props) => {
+  console.log({ clippings });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
@@ -37,41 +39,54 @@ const SubmitForm = ({
   };
   return (
     <div style={{ marginTop: "32px", width: "100%" }}>
-      <Grid columns={1} style={{ width: "100%" }}>
+      <Grid columns={5} style={{ width: "100%" }}>
         {clippings.map((clipping: CleanedClipping, index: Key) => {
           return (
             <Grid.Column
-              style={{ marginLeft: "0px", marginRight: "0px" }}
+              style={{
+                marginLeft: "0px",
+                marginRight: "0px",
+                width: "250px",
+              }}
               key={index}
             >
-              <Card
-                fluid
-                header={clipping.title}
-                meta={clipping.author}
-                description={() => (
-                  <div>
-                    <Accordion>
-                      <Accordion.Title
-                        active={activeIndex === index}
-                        index={index}
-                        onClick={expandAccordion}
-                      >
-                        <Icon name="dropdown" />
-                        {clipping.clippings.length} clippings
-                      </Accordion.Title>
-                      <Accordion.Content active={activeIndex === index}>
-                        <ol>
-                          {clipping.clippings.map((c, i) => (
-                            <li key={i}>
-                              <Message>{c}</Message>
-                            </li>
-                          ))}
-                        </ol>
-                      </Accordion.Content>
-                    </Accordion>
-                  </div>
+              <Card>
+                {console.log({ c: clipping.coverImage })}
+                {clipping.coverImage && clipping.coverImage !== "" && (
+                  <Image
+                    src={clipping.coverImage.thumbnail}
+                    wrapped
+                    ui={false}
+                  />
                 )}
-              />
+                <Card.Content>
+                  <Card.Header>{clipping.title}</Card.Header>
+                  <Card.Meta>{clipping.author}</Card.Meta>
+                  <Card.Description>
+                    <div>
+                      <Accordion>
+                        <Accordion.Title
+                          active={activeIndex === index}
+                          index={index}
+                          onClick={expandAccordion}
+                        >
+                          <Icon name="dropdown" />
+                          {clipping.clippings.length} clippings
+                        </Accordion.Title>
+                        <Accordion.Content active={activeIndex === index}>
+                          <ol>
+                            {clipping.clippings.map((c, i) => (
+                              <li key={i}>
+                                <Message>{c}</Message>
+                              </li>
+                            ))}
+                          </ol>
+                        </Accordion.Content>
+                      </Accordion>
+                    </div>
+                  </Card.Description>
+                </Card.Content>
+              </Card>
             </Grid.Column>
           );
         })}
@@ -81,7 +96,7 @@ const SubmitForm = ({
           fluid
           primary={!submitted}
           positive={submitted}
-          disabled={!(!submitted && !submitting)}
+          disabled={!!submitting}
           loading={submitting}
           onClick={() => {
             setSubmitting(true);

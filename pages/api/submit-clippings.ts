@@ -33,6 +33,7 @@ type AddBookToNotionArgs = {
   title: string;
   author: string;
   aggregrateText: string[];
+  coverImage: { smallThumbnail: string; thumbnail: string } | undefined;
 };
 
 const addBookToNotion = async ({
@@ -41,12 +42,38 @@ const addBookToNotion = async ({
   title,
   author,
   aggregrateText,
+  coverImage,
 }: AddBookToNotionArgs) => {
+  const iconImageURL = coverImage ? coverImage.smallThumbnail : "";
+
+  const coverImageURL = coverImage ? coverImage.thumbnail : "";
+
   const response = await notion.pages.create({
     parent: {
       type: "database_id",
       database_id: notionDatabaseID,
     },
+    cover: {
+      type: "external",
+      external: {
+        url:
+          coverImageURL !== ""
+            ? coverImageURL
+            : "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+      },
+    },
+    icon:
+      iconImageURL !== ""
+        ? {
+            type: "external",
+            external: {
+              url: iconImageURL,
+            },
+          }
+        : {
+            type: "emoji",
+            emoji: "📖",
+          },
     properties: {
       Title: {
         title: [
@@ -69,7 +96,7 @@ const addBookToNotion = async ({
     },
     children: aggregrateText.map((text: string) => ({
       object: "block",
-      paragraph: {
+      quote: {
         rich_text: [
           {
             text: {
@@ -110,7 +137,7 @@ async function exportToNotion({ books, notionDatabaseID, notion, res }: any) {
   for await (const book of keys) {
     const bookObject: Book = books[book];
     const aggregrateText = prepareAggregrateTextForOneBook(bookObject);
-    const { title, author } = bookObject;
+    const { title, author, coverImage } = bookObject;
 
     const queryTitle = await getTitle(notionDatabaseID, notion, title);
     const titleExists = queryTitle.results.length > 0;
@@ -126,6 +153,7 @@ async function exportToNotion({ books, notionDatabaseID, notion, res }: any) {
           title,
           author,
           aggregrateText,
+          coverImage,
         });
       } catch (e) {
         console.error("error while submitting", e);

@@ -1,5 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import axios from "axios";
+import { compareTwoStrings } from "string-similarity";
+import { isEmpty, lowerCase } from "lodash";
 
 type Clipping = {
   title: string;
@@ -14,10 +17,17 @@ type CleanedClipping = {
   clippings: Array<string>;
 };
 
+type ClippingWithCover = {
+  title: string;
+  author: string;
+  clippings: Array<string>;
+  coverImage: string;
+};
+
 type Data = {
   name: string;
   clippings: Array<Clipping>;
-  cleanedClippings: Array<CleanedClipping>;
+  cleanedClippings: Array<ClippingWithCover>;
 };
 
 const getHighlightedContent = (slug: string) => {
@@ -77,20 +87,70 @@ export default async function handler(
       const { title, author } = getTitleAndAuthor(s.split("\n")[1]);
 
       const content = s.split("\n")[4];
+      const locationInfo = s.split("\n")[2];
+      const locationRegEx = /location ([0-9])\w+-([0-9])\w+/;
+      const dateRegex = /([0-9]* [A-Z])\w+ [0-9]{4}/;
+
+      const locationString =
+        !isEmpty(locationInfo) && !isEmpty(locationInfo.match(locationRegEx))
+          ? locationInfo.match(locationRegEx)[0]
+          : "";
+      const dateString =
+        !isEmpty(locationInfo) && !isEmpty(locationInfo.match(dateRegex))
+          ? locationInfo.match(dateRegex)[0]
+          : "";
+
+      const contentWithLocation = !isEmpty(content)
+        ? `${content} \n\n ${locationString} | Added on ${dateString}`
+        : "";
       return {
         title,
         author,
         location: s.split("|")[1],
-        body: content,
+        body: contentWithLocation,
       };
     })
     .filter((c: Clipping) => !!c.body && c.body !== "");
 
   const cleanedClippings = await convertClippingsArrayToObject(clippingsArray);
 
+  let clippingsWithCover = [];
+
+  for await (const { title, author } of cleanedClippings) {
+    const googleBooksResponse = await axios({
+      url: `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(
+        lowerCase(title)
+      )}`,
+      method: "get",
+    });
+
+    const coverImage =
+      googleBooksResponse.data.totalItems > 0
+        ? googleBooksResponse.data.items[0].volumeInfo.imageLinks
+        : "";
+    const authorFromGoogleBooks =
+      googleBooksResponse.data.totalItems > 0
+        ? googleBooksResponse.data.items[0].volumeInfo.authors[0]
+        : "";
+    const authorSimilarity = compareTwoStrings(
+      lowerCase(author),
+      lowerCase(authorFromGoogleBooks)
+    );
+
+    const finalAuthorName: string =
+      authorSimilarity >= 0.4 || isEmpty(author)
+        ? authorFromGoogleBooks
+        : author;
+    clippingsWithCover.push({
+      ...cleanedClippings.find((c) => c.title === title),
+      author: finalAuthorName,
+      coverImage,
+    });
+  }
+
   res.status(200).json({
     name: "John Doe",
     clippings: clippingsArray,
-    cleanedClippings,
+    cleanedClippings: clippingsWithCover,
   });
 }
