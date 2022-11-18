@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { compareTwoStrings } from "string-similarity";
-import { isEmpty, lowerCase } from "lodash";
+import { isEmpty, isNull, lowerCase } from "lodash";
 
 type Clipping = {
   title: string;
@@ -21,7 +21,7 @@ type ClippingWithCover = {
   title: string;
   author: string;
   clippings: Array<string>;
-  coverImage: string;
+  coverImage: any;
 };
 
 type Data = {
@@ -92,12 +92,18 @@ export default async function handler(
       const dateRegex = /([0-9]* [A-Z])\w+ [0-9]{4}/;
 
       const locationString =
-        !isEmpty(locationInfo) && !isEmpty(locationInfo.match(locationRegEx))
-          ? locationInfo.match(locationRegEx)[0]
+        !isEmpty(locationInfo) &&
+        !isNull(locationInfo) &&
+        !isEmpty(locationInfo.match(locationRegEx))
+          ? // @ts-ignore
+            locationInfo?.match(locationRegEx)[0]
           : "";
       const dateString =
-        !isEmpty(locationInfo) && !isEmpty(locationInfo.match(dateRegex))
-          ? locationInfo.match(dateRegex)[0]
+        !isEmpty(locationInfo) &&
+        !isNull(locationInfo) &&
+        !isEmpty(locationInfo.match(dateRegex))
+          ? // @ts-ignore
+            locationInfo?.match(dateRegex)[0]
           : "";
 
       const contentWithLocation = !isEmpty(content)
@@ -116,7 +122,7 @@ export default async function handler(
 
   let clippingsWithCover = [];
 
-  for await (const { title, author } of cleanedClippings) {
+  for await (const { title, author, clippings } of cleanedClippings) {
     const googleBooksResponse = await axios({
       url: `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(
         lowerCase(title)
@@ -142,7 +148,8 @@ export default async function handler(
         ? authorFromGoogleBooks
         : author;
     clippingsWithCover.push({
-      ...cleanedClippings.find((c) => c.title === title),
+      title,
+      clippings,
       author: finalAuthorName,
       coverImage,
     });
