@@ -14,6 +14,7 @@ type Book = {
   title: string;
   author: string;
   clippings: Array<string>;
+  coverImage: { smallThumbnail: string; thumbnail: string } | undefined;
 };
 
 const prepareAggregrateTextForOneBook = (book: Book) => {
