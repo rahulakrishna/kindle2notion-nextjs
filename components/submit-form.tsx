@@ -11,7 +11,7 @@ import {
   Input,
 } from "semantic-ui-react";
 
-import { CleanedClipping } from "../pages/types";
+import { CleanedClipping } from "../utils/types";
 
 type Props = {
   clippings: CleanedClipping[];

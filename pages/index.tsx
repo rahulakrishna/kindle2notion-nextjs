@@ -7,7 +7,7 @@ import { Step } from "semantic-ui-react";
 import ValidateForm from "../components/validate-form";
 import SubmitForm from "../components/submit-form";
 
-import { ClippingsResult } from "./types";
+import { ClippingsResult } from "../utils/types";
 
 const Home: NextPage = () => {
   const [notionApiAuthToken, setNotionApiAuthToken] = useState("");
