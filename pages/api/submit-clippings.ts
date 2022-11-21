@@ -39,6 +39,67 @@ type AddBookToNotionArgs = {
   lastHighlightedDate: string;
 };
 
+type UpdateBookInNotionArgs = {
+  notion: Client;
+  notionDatabaseID: string;
+  title: string;
+  author: string;
+  aggregrateText: string[];
+  coverImage: { smallThumbnail: string; thumbnail: string } | undefined;
+  lastHighlightedDate: string;
+  pageId: string;
+};
+
+const updateBookInNotion = async ({
+  notion,
+  notionDatabaseID,
+  title,
+  author,
+  aggregrateText,
+  coverImage,
+  lastHighlightedDate,
+  pageId,
+}: UpdateBookInNotionArgs) => {
+  await notion.pages.update({
+    page_id: pageId,
+    properties: {
+      Author: {
+        rich_text: [
+          {
+            text: {
+              content: author,
+            },
+          },
+        ],
+      },
+      "Last Highlighted Date": {
+        rich_text: [
+          {
+            text: {
+              content: lastHighlightedDate,
+            },
+          },
+        ],
+      },
+    },
+  });
+  const response = await notion.blocks.children.append({
+    block_id: pageId,
+    children: aggregrateText.map((text: string) => ({
+      object: "block",
+      quote: {
+        rich_text: [
+          {
+            text: {
+              content: text,
+            },
+          },
+        ],
+      },
+    })),
+  });
+};
+
 const addBookToNotion = async ({
   notion,
   notionDatabaseID,
@@ -164,6 +225,20 @@ async function exportToNotion({ books, notionDatabaseID, notion, res }: any) {
 
     if (titleExists) {
       // update flow here
+      // queryTitle should have details on the page
+      // modify the contents of that page
+
+      const pageId = queryTitle.results[0].id;
+      await updateBookInNotion({
+        notion,
+        notionDatabaseID,
+        title,
+        author,
+        aggregrateText,
+        coverImage,
+        lastHighlightedDate,
+        pageId,
+      });
     } else {
       // create flow here
       try {

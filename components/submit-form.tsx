@@ -76,6 +76,7 @@ const SubmitForm = ({
                             width: "100%",
                             height: "50px",
                             overflow: "visible",
+                            background: "#fff",
                           }}
                           onChange={(e) => {
                             setClippingsToSubmit((prevClippings) => {
@@ -97,7 +98,11 @@ const SubmitForm = ({
                       <input
                         value={clipping.author}
                         className="edit"
-                        style={{ fontFamily: "Lato", width: "100%" }}
+                        style={{
+                          fontFamily: "Lato",
+                          width: "100%",
+                          background: "#fff",
+                        }}
                         onChange={(e) => {
                           setClippingsToSubmit((prevClippings) => {
                             return prevClippings?.map((c, i) => {

@@ -154,7 +154,7 @@ export default async function handler(
       authorSimilarity >= 0.4 || isEmpty(author)
         ? authorFromGoogleBooks
         : author;
-    console.log("clippings", clippingsArray);
+
     const clippingsForBook = clippingsArray.filter(
       (c: Clipping) => c.title === title
     );
