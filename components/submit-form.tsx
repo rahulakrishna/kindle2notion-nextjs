@@ -33,7 +33,7 @@ const SubmitForm = ({
     useState<CleanedClipping[]>();
   useEffect(() => {
     setClippingsToSubmit(clippings);
-  }, [JSON.stringify(clippings)]);
+  }, [clippings]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
