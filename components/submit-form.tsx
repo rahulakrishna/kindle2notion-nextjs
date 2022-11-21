@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SyntheticEvent, useState, Key } from "react";
+import { SyntheticEvent, useState, useEffect, Key } from "react";
 import {
   Button,
   Card,
@@ -8,9 +8,10 @@ import {
   Message,
   Accordion,
   Icon,
+  Input,
 } from "semantic-ui-react";
 
-import { CleanedClipping } from "./types";
+import { CleanedClipping } from "../utils/types";
 
 type Props = {
   clippings: CleanedClipping[];
@@ -28,6 +29,11 @@ const SubmitForm = ({
   setCompleted,
 }: Props) => {
   console.log({ clippings });
+  const [clippingsToSubmit, setClippingsToSubmit] =
+    useState<CleanedClipping[]>();
+  useEffect(() => {
+    setClippingsToSubmit(clippings);
+  }, [clippings]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
@@ -39,30 +45,74 @@ const SubmitForm = ({
   };
   return (
     <div style={{ marginTop: "32px", width: "100%" }}>
-      <Grid columns={5} style={{ width: "100%" }}>
-        {clippings.map((clipping: CleanedClipping, index: Key) => {
+      <Grid columns={2} style={{ width: "100%" }}>
+        {clippingsToSubmit?.map((clipping: CleanedClipping, index: Key) => {
           return (
             <Grid.Column
               style={{
                 marginLeft: "0px",
                 marginRight: "0px",
-                width: "250px",
+                width: "50%",
               }}
               key={index}
             >
-              <Card>
+              <Card style={{ width: "100%" }}>
                 <>
-                  {clipping.coverImage && clipping.coverImage && (
-                    <Image
-                      alt="book cover"
-                      src={clipping.coverImage.thumbnail}
-                      wrapped
-                      ui={false}
-                    />
-                  )}
                   <Card.Content>
-                    <Card.Header>{clipping.title}</Card.Header>
-                    <Card.Meta>{clipping.author}</Card.Meta>
+                    <Card.Header>
+                      <div className="flex justify-center items-center">
+                        {clipping.coverImage && clipping.coverImage && (
+                          <Image
+                            alt="book cover"
+                            src={clipping.coverImage.thumbnail}
+                            ui={false}
+                            className="w-10 mr-2"
+                          />
+                        )}
+                        <textarea
+                          value={clipping.title}
+                          style={{
+                            fontFamily: "Lato",
+                            width: "100%",
+                            height: "50px",
+                            overflow: "visible",
+                          }}
+                          onChange={(e) => {
+                            setClippingsToSubmit((prevClippings) => {
+                              return prevClippings?.map((c, i) => {
+                                if (i === index) {
+                                  return {
+                                    ...c,
+                                    title: e.target.value,
+                                  };
+                                }
+                                return c;
+                              });
+                            });
+                          }}
+                        />
+                      </div>
+                    </Card.Header>
+                    <Card.Meta>
+                      <input
+                        value={clipping.author}
+                        className="edit"
+                        style={{ fontFamily: "Lato", width: "100%" }}
+                        onChange={(e) => {
+                          setClippingsToSubmit((prevClippings) => {
+                            return prevClippings?.map((c, i) => {
+                              if (i === index) {
+                                return {
+                                  ...c,
+                                  author: e.target.value,
+                                };
+                              }
+                              return c;
+                            });
+                          });
+                        }}
+                      />
+                    </Card.Meta>
                     <Card.Description>
                       <div>
                         <Accordion>
@@ -102,13 +152,14 @@ const SubmitForm = ({
           loading={submitting}
           onClick={() => {
             setSubmitting(true);
+            console.log({ clippings, clippingsToSubmit, books });
             axios({
               method: "post",
               url: "api/submit-clippings",
               data: {
                 notionApiAuthToken,
                 notionDatabaseID,
-                books,
+                books: clippingsToSubmit,
               },
             })
               .then(({ data }) => {

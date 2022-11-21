@@ -25,7 +25,6 @@ type ClippingWithCover = {
 };
 
 type Data = {
-  name: string;
   clippings: Array<Clipping>;
   cleanedClippings: Array<ClippingWithCover>;
 };
@@ -79,7 +78,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const { notionApiAuthToken, notionDatabaseID, clippingsFile } = req.body;
+  const { includeCoverImage, clippingsFile } = req.body;
 
   const clippingsArray = clippingsFile
     .split("==========")
@@ -123,20 +122,22 @@ export default async function handler(
   let clippingsWithCover = [];
 
   for await (const { title, author, clippings } of cleanedClippings) {
-    const googleBooksResponse = await axios({
-      url: `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(
-        lowerCase(title)
-      )}`,
-      method: "get",
-    });
+    const googleBooksResponse = includeCoverImage
+      ? await axios({
+          url: `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(
+            lowerCase(title)
+          )}`,
+          method: "get",
+        })
+      : undefined;
 
     const coverImage =
-      googleBooksResponse.data.totalItems > 0
-        ? googleBooksResponse.data.items[0].volumeInfo.imageLinks
+      includeCoverImage && googleBooksResponse?.data.totalItems > 0
+        ? googleBooksResponse?.data.items[0].volumeInfo.imageLinks
         : undefined;
     const authorFromGoogleBooks =
-      googleBooksResponse.data.totalItems > 0
-        ? googleBooksResponse.data.items[0].volumeInfo.authors[0]
+      includeCoverImage && googleBooksResponse?.data.totalItems > 0
+        ? googleBooksResponse?.data.items[0].volumeInfo.authors[0]
         : "";
     const authorSimilarity = compareTwoStrings(
       lowerCase(author),
@@ -156,7 +157,6 @@ export default async function handler(
   }
 
   res.status(200).json({
-    name: "John Doe",
     clippings: clippingsArray,
     cleanedClippings: clippingsWithCover,
   });

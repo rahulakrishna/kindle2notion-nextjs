@@ -1,6 +1,6 @@
 import { SyntheticEvent } from "react";
 import axios from "axios";
-import { Input, Button } from "semantic-ui-react";
+import { Input, Button, Checkbox } from "semantic-ui-react";
 
 import { Form } from "../styles/form.styles";
 
@@ -14,6 +14,8 @@ type Props = {
   setClippingsFile: Function;
   setActiveStep: Function;
   resultLoading: boolean;
+  includeCoverImage: boolean;
+  toggleIncludeCoverImage: Function;
 };
 
 const ValidateForm = ({
@@ -26,6 +28,8 @@ const ValidateForm = ({
   setClippingsFile,
   setActiveStep,
   resultLoading,
+  includeCoverImage,
+  toggleIncludeCoverImage,
 }: Props) => {
   return (
     <Form
@@ -46,6 +50,7 @@ const ValidateForm = ({
             notionApiAuthToken,
             notionDatabaseID,
             clippingsFile,
+            includeCoverImage,
           },
         })
           .then(({ data }) => {
@@ -98,6 +103,14 @@ const ValidateForm = ({
             };
           }
         }}
+      />
+      <br />
+      <br />
+      <Checkbox
+        label="Include Cover Image"
+        toggle
+        checked={includeCoverImage}
+        onChange={(e, data) => toggleIncludeCoverImage(data.checked)}
       />
       <br />
       <br />
