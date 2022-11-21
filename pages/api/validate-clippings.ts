@@ -9,12 +9,14 @@ type Clipping = {
   author: string;
   location: string;
   body: string;
+  date: string;
 };
 
 type CleanedClipping = {
   title: string;
   author: string;
   clippings: Array<string>;
+  lastHighlightedDate: string;
 };
 
 type ClippingWithCover = {
@@ -22,6 +24,7 @@ type ClippingWithCover = {
   author: string;
   clippings: Array<string>;
   coverImage: any;
+  lastHighlightedDate: string;
 };
 
 type Data = {
@@ -69,6 +72,7 @@ const convertClippingsArrayToObject = (clippings: Array<Clipping>) => {
         title: clipping.title,
         author: clipping.author,
         clippings: [clipping.body],
+        lastHighlightedDate: clipping.date,
       },
     ];
   }, []);
@@ -80,6 +84,8 @@ export default async function handler(
 ) {
   const { includeCoverImage, clippingsFile } = req.body;
 
+  const dateRegex = /([0-9]* [A-Z])\w+ [0-9]{4}/;
+
   const clippingsArray = clippingsFile
     .split("==========")
     .map((s: string) => {
@@ -88,7 +94,6 @@ export default async function handler(
       const content = s.split("\n")[4];
       const locationInfo = s.split("\n")[2];
       const locationRegEx = /location ([0-9])\w+-([0-9])\w+/;
-      const dateRegex = /([0-9]* [A-Z])\w+ [0-9]{4}/;
 
       const locationString =
         !isEmpty(locationInfo) &&
@@ -113,6 +118,7 @@ export default async function handler(
         author,
         location: s.split("|")[1],
         body: contentWithLocation,
+        date: dateString,
       };
     })
     .filter((c: Clipping) => !!c.body && c.body !== "");
@@ -148,11 +154,16 @@ export default async function handler(
       authorSimilarity >= 0.4 || isEmpty(author)
         ? authorFromGoogleBooks
         : author;
+    console.log("clippings", clippingsArray);
+    const clippingsForBook = clippingsArray.filter(
+      (c: Clipping) => c.title === title
+    );
     clippingsWithCover.push({
       title,
       clippings,
       author: finalAuthorName,
       coverImage,
+      lastHighlightedDate: clippingsForBook[clippingsForBook.length - 1].date,
     });
   }
 

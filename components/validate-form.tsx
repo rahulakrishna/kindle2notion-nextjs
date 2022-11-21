@@ -54,7 +54,6 @@ const ValidateForm = ({
           },
         })
           .then(({ data }) => {
-            console.log({ data });
             setResult({
               data: data.cleanedClippings,
               error: false,

@@ -15,6 +15,7 @@ type Book = {
   author: string;
   clippings: Array<string>;
   coverImage: { smallThumbnail: string; thumbnail: string } | undefined;
+  lastHighlightedDate: string;
 };
 
 const prepareAggregrateTextForOneBook = (book: Book) => {
@@ -35,6 +36,7 @@ type AddBookToNotionArgs = {
   author: string;
   aggregrateText: string[];
   coverImage: { smallThumbnail: string; thumbnail: string } | undefined;
+  lastHighlightedDate: string;
 };
 
 const addBookToNotion = async ({
@@ -44,6 +46,7 @@ const addBookToNotion = async ({
   author,
   aggregrateText,
   coverImage,
+  lastHighlightedDate,
 }: AddBookToNotionArgs) => {
   const iconImageURL = coverImage ? coverImage.smallThumbnail : "";
 
@@ -94,6 +97,15 @@ const addBookToNotion = async ({
           },
         ],
       },
+      "Last Highlighted Date": {
+        rich_text: [
+          {
+            text: {
+              content: lastHighlightedDate,
+            },
+          },
+        ],
+      },
     },
     children: aggregrateText.map((text: string) => ({
       object: "block",
@@ -132,12 +144,19 @@ const getTitle = async (
   return queryTitle;
 };
 
+const getLastHighlightedDate = (book: Book) => {
+  const lastClipping = book.clippings[book.clippings.length - 1];
+  const lastHighlightedDate = lastClipping.split(" | ")[0];
+  return lastHighlightedDate;
+};
+
 async function exportToNotion({ books, notionDatabaseID, notion, res }: any) {
   let errorLog = [];
   const keys = Object.keys(books);
   for await (const book of keys) {
     const bookObject: Book = books[book];
     const aggregrateText = prepareAggregrateTextForOneBook(bookObject);
+    const lastHighlightedDate = bookObject.lastHighlightedDate;
     const { title, author, coverImage } = bookObject;
 
     const queryTitle = await getTitle(notionDatabaseID, notion, title);
@@ -155,6 +174,7 @@ async function exportToNotion({ books, notionDatabaseID, notion, res }: any) {
           author,
           aggregrateText,
           coverImage,
+          lastHighlightedDate,
         });
       } catch (e) {
         console.error("error while submitting", e);
