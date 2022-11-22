@@ -53,7 +53,8 @@ const SubmitForm = ({
               style={{
                 marginLeft: "0px",
                 marginRight: "0px",
-                width: "50%",
+                width:
+                  document.documentElement.clientWidth > 600 ? "50%" : "100%",
               }}
               key={index}
             >
@@ -68,7 +69,14 @@ const SubmitForm = ({
                 <>
                   <Card.Content>
                     <Card.Header>
-                      <div className="flex justify-center items-center">
+                      <div
+                        className="flex justify-center items-center"
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
                         {clipping.coverImage && clipping.coverImage && (
                           <Image
                             alt="book cover"
@@ -192,7 +200,7 @@ const SubmitForm = ({
                                         background:
                                           c.length > 2000
                                             ? "rgba(255,0,0,0.1)"
-                                            : "#fff",
+                                            : "#f8f8f9",
                                         minHeight: "150px",
                                         overflow: "visible",
                                       }}
@@ -213,6 +221,10 @@ const SubmitForm = ({
         })}
       </Grid>
       <Grid style={{ marginBottom: "32px" }}>
+        {clippingsToSubmit?.some((c) =>
+          c.clippings.some((c) => c.length > 2000)
+        ) &&
+          "Some of your clippings exceed 2000 characters, the limit set by Notion for a block. Please edit the portions highlighted in red"}
         <Button
           fluid
           primary={!submitted}
