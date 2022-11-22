@@ -205,7 +205,6 @@ const SubmitForm = ({
             </Grid.Column>
           );
         })}
-        {console.log({ cleanedClippings: clippingsToSubmit })}
       </Grid>
       <Grid style={{ marginBottom: "32px" }}>
         <Button
