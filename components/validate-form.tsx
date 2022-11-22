@@ -2,7 +2,6 @@ import { SyntheticEvent } from "react";
 import axios from "axios";
 import { Input, Button, Checkbox } from "semantic-ui-react";
 
-import { Form } from "../styles/form.styles";
 import Link from "next/link";
 
 type Props = {
