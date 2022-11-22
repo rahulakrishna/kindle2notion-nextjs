@@ -279,3 +279,11 @@ export default async function handler(
     res,
   });
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "20mb",
+    },
+  },
+};

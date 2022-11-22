@@ -46,6 +46,7 @@ const SubmitForm = ({
   return (
     <div style={{ marginTop: "32px", width: "100%" }}>
       <Grid columns={2} style={{ width: "100%" }}>
+        {/* TODO: change the name to booksToSubmit */}
         {clippingsToSubmit?.map((clipping: CleanedClipping, index: Key) => {
           return (
             <Grid.Column
@@ -56,7 +57,14 @@ const SubmitForm = ({
               }}
               key={index}
             >
-              <Card style={{ width: "100%" }}>
+              <Card
+                style={{
+                  width: "100%",
+                  background: clipping.clippings.some((c) => c.length > 2000)
+                    ? "rgba(255,0,0, 0.5)"
+                    : "#fff",
+                }}
+              >
                 <>
                   <Card.Content>
                     <Card.Header>
@@ -76,7 +84,11 @@ const SubmitForm = ({
                             width: "100%",
                             height: "50px",
                             overflow: "visible",
-                            background: "#fff",
+                            background: clipping.clippings.some(
+                              (c) => c.length > 2000
+                            )
+                              ? "rgba(255,0,0, 0.1)"
+                              : "#fff",
                           }}
                           onChange={(e) => {
                             setClippingsToSubmit((prevClippings) => {
@@ -101,7 +113,11 @@ const SubmitForm = ({
                         style={{
                           fontFamily: "Lato",
                           width: "100%",
-                          background: "#fff",
+                          background: clipping.clippings.some(
+                            (c) => c.length > 2000
+                          )
+                            ? "rgba(255,0,0, 0.1)"
+                            : "#fff",
                         }}
                         onChange={(e) => {
                           setClippingsToSubmit((prevClippings) => {
@@ -133,7 +149,49 @@ const SubmitForm = ({
                             <ol>
                               {clipping.clippings.map((c, i) => (
                                 <li key={i}>
-                                  <Message>{c}</Message>
+                                  <Message>
+                                    <textarea
+                                      value={c}
+                                      onChange={(e) => {
+                                        setClippingsToSubmit(
+                                          (prevClippings) => {
+                                            return prevClippings?.map(
+                                              (c, j) => {
+                                                if (j === index) {
+                                                  return {
+                                                    ...c,
+                                                    clippings: c.clippings.map(
+                                                      (c, k) => {
+                                                        console.log({
+                                                          c,
+                                                          k,
+                                                          i,
+                                                        });
+                                                        if (k === i) {
+                                                          return e.target.value;
+                                                        }
+                                                        return c;
+                                                      }
+                                                    ),
+                                                  };
+                                                }
+                                                return c;
+                                              }
+                                            );
+                                          }
+                                        );
+                                      }}
+                                      style={{
+                                        width: "100%",
+                                        background:
+                                          c.length > 2000
+                                            ? "rgba(255,0,0,0.1)"
+                                            : "#fff",
+                                        minHeight: "150px",
+                                        overflow: "visible",
+                                      }}
+                                    ></textarea>
+                                  </Message>
                                 </li>
                               ))}
                             </ol>
@@ -147,13 +205,19 @@ const SubmitForm = ({
             </Grid.Column>
           );
         })}
+        {console.log({ cleanedClippings: clippingsToSubmit })}
       </Grid>
       <Grid style={{ marginBottom: "32px" }}>
         <Button
           fluid
           primary={!submitted}
           positive={submitted}
-          disabled={!!submitting}
+          disabled={
+            !!submitting ||
+            clippingsToSubmit?.some((c) =>
+              c.clippings.some((c) => c.length > 2000)
+            )
+          }
           loading={submitting}
           onClick={() => {
             setSubmitting(true);

@@ -141,9 +141,17 @@ export default async function handler(
       includeCoverImage && googleBooksResponse?.data.totalItems > 0
         ? googleBooksResponse?.data.items[0].volumeInfo.imageLinks
         : undefined;
+    console.log(
+      googleBooksResponse?.data.totalItems > 0
+        ? googleBooksResponse?.data.items[0].volumeInfo
+        : "No results found"
+    );
     const authorFromGoogleBooks =
       includeCoverImage && googleBooksResponse?.data.totalItems > 0
-        ? googleBooksResponse?.data.items[0].volumeInfo.authors[0]
+        ? googleBooksResponse?.data.items[0].volumeInfo.authors &&
+          googleBooksResponse?.data.items[0].volumeInfo.authors.length > 0
+          ? googleBooksResponse?.data.items[0].volumeInfo.authors[0]
+          : ""
         : "";
     const authorSimilarity = compareTwoStrings(
       lowerCase(author),
@@ -172,3 +180,11 @@ export default async function handler(
     cleanedClippings: clippingsWithCover,
   });
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "20mb",
+    },
+  },
+};

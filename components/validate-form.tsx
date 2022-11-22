@@ -3,6 +3,7 @@ import axios from "axios";
 import { Input, Button, Checkbox } from "semantic-ui-react";
 
 import { Form } from "../styles/form.styles";
+import Link from "next/link";
 
 type Props = {
   notionApiAuthToken: string;
@@ -32,7 +33,7 @@ const ValidateForm = ({
   toggleIncludeCoverImage,
 }: Props) => {
   return (
-    <Form
+    <form
       onSubmit={(e: SyntheticEvent) => {
         e.preventDefault();
         localStorage.setItem("notionApiAuthToken", notionApiAuthToken);
@@ -71,6 +72,11 @@ const ValidateForm = ({
           });
       }}
     >
+      <Link href="https://thisdot.notion.site/Kindle2Notion-Instructions-0e01105be77a471ba0d559f21e494e08">
+        Instructions to generate tokens here
+      </Link>
+      <br />
+      <br />
       <Input
         fluid
         type="text"
@@ -78,6 +84,7 @@ const ValidateForm = ({
         placeholder="Notion Token"
         value={notionApiAuthToken}
         onChange={(e) => setNotionApiAuthToken(e.target.value)}
+        className="m-b-16"
       />
       <br />
       <Input
@@ -87,6 +94,7 @@ const ValidateForm = ({
         placeholder="Page ID"
         value={notionDatabaseID}
         onChange={(e) => setNotionDatabaseID(e.target.value)}
+        className="m-b-16"
       />
       <br />
       <Input
@@ -102,6 +110,7 @@ const ValidateForm = ({
             };
           }
         }}
+        className="m-b-16"
       />
       <br />
       <br />
@@ -110,6 +119,7 @@ const ValidateForm = ({
         toggle
         checked={includeCoverImage}
         onChange={(e, data) => toggleIncludeCoverImage(data.checked)}
+        className="m-b-16"
       />
       <br />
       <br />
@@ -122,7 +132,7 @@ const ValidateForm = ({
       >
         Submit
       </Button>
-    </Form>
+    </form>
   );
 };
 
