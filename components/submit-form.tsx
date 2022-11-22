@@ -80,6 +80,8 @@ const SubmitForm = ({
                         <textarea
                           value={clipping.title}
                           style={{
+                            border: "none",
+                            color: "black",
                             fontFamily: "Lato",
                             width: "100%",
                             height: "50px",
@@ -111,6 +113,8 @@ const SubmitForm = ({
                         value={clipping.author}
                         className="edit"
                         style={{
+                          border: "none",
+                          color: "black",
                           fontFamily: "Lato",
                           width: "100%",
                           background: clipping.clippings.some(
@@ -183,6 +187,8 @@ const SubmitForm = ({
                                       }}
                                       style={{
                                         width: "100%",
+                                        color: "black",
+                                        border: "none",
                                         background:
                                           c.length > 2000
                                             ? "rgba(255,0,0,0.1)"
