@@ -9,7 +9,9 @@ import {
   Accordion,
   Icon,
   Input,
+  Progress,
 } from "semantic-ui-react";
+import { submitToNotion } from "../utils/submit-to-notion";
 
 import { CleanedClipping } from "../utils/types";
 
@@ -28,6 +30,7 @@ const SubmitForm = ({
   books,
   setCompleted,
 }: Props) => {
+  const [currentBook, setCurrentBook] = useState("");
   console.log({ clippings });
   const [clippingsToSubmit, setClippingsToSubmit] =
     useState<CleanedClipping[]>();
@@ -239,34 +242,54 @@ const SubmitForm = ({
           onClick={() => {
             setSubmitting(true);
             console.log({ clippings, clippingsToSubmit, books });
-            axios({
-              method: "post",
-              url: "api/submit-clippings",
-              data: {
+            (async () => {
+              await submitToNotion({
                 notionApiAuthToken,
                 notionDatabaseID,
                 books: clippingsToSubmit,
-              },
-            })
-              .then(({ data }) => {
-                setCompleted(true);
-                console.log({ data });
-                setSubmitted(true);
-              })
-              .catch((e) => {
-                console.error(e);
-              })
-              .finally(() => {
-                setSubmitting(false);
+                setCurrentBook,
               });
+            })();
+            // axios({
+            //   method: "post",
+            //   url: "api/submit-clippings",
+            //   data: {
+            //     notionApiAuthToken,
+            //     notionDatabaseID,
+            //     books: clippingsToSubmit,
+            //   },
+            // })
+            //   .then(({ data }) => {
+            //     setCompleted(true);
+            //     console.log({ data });
+            //     setSubmitted(true);
+            //   })
+            //   .catch((e) => {
+            //     console.error(e);
+            //   })
+            //   .finally(() => {
+            //     setSubmitting(false);
+            //   });
           }}
         >
           {!submitted ? "Upload to Notion" : "Done!"}
         </Button>
         <br />
         <br />
-        <br />
       </Grid>
+      {currentBook !== "" && (
+        <Progress
+          percent={
+            clippingsToSubmit !== undefined
+              ? (clippingsToSubmit?.map((c) => c.title).indexOf(currentBook) /
+                  clippingsToSubmit?.length) *
+                100
+              : 0
+          }
+        >
+          Adding {currentBook} to Notion
+        </Progress>
+      )}
     </div>
   );
 };

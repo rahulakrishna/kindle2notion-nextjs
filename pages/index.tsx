@@ -30,7 +30,7 @@ const Home: NextPage = () => {
     loading: false,
   });
 
-  const [includeCoverImage, toggleIncludeCoverImage] = useState(false);
+  const [includeCoverImage, toggleIncludeCoverImage] = useState(true);
 
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<boolean>(false);

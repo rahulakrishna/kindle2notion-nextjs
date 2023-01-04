@@ -1,8 +1,10 @@
-import { SyntheticEvent } from "react";
+import { useState, SyntheticEvent } from "react";
 import axios from "axios";
-import { Input, Button, Checkbox } from "semantic-ui-react";
+import { Input, Button, Checkbox, Progress } from "semantic-ui-react";
 
 import Link from "next/link";
+
+import { validateForm, getAllTitles } from "../utils/validate-form";
 
 type Props = {
   notionApiAuthToken: string;
@@ -31,6 +33,8 @@ const ValidateForm = ({
   includeCoverImage,
   toggleIncludeCoverImage,
 }: Props) => {
+  const [currentBook, setCurrentBook] = useState("");
+  const [allTitles, setAllTitles] = useState<any[]>([]);
   return (
     <form
       onSubmit={(e: SyntheticEvent) => {
@@ -42,33 +46,50 @@ const ValidateForm = ({
           error: false,
           loading: true,
         });
-
-        axios({
-          method: "post",
-          url: "api/validate-clippings",
-          data: {
-            notionApiAuthToken,
-            notionDatabaseID,
-            clippingsFile,
+        (async () => {
+          const uniqueTitles: any[] = getAllTitles(clippingsFile);
+          setAllTitles(uniqueTitles);
+          const results = await validateForm({
             includeCoverImage,
-          },
-        })
-          .then(({ data }) => {
-            setResult({
-              data: data.cleanedClippings,
-              error: false,
-              loading: false,
-            });
-            setActiveStep(1);
-          })
-          .catch((e) => {
-            console.error(e);
-            setResult({
-              data: [],
-              error: true,
-              loading: false,
-            });
+            clippingsFile,
+            setCurrentBook,
           });
+
+          console.log({ results });
+          setResult({
+            data: results,
+            error: false,
+            loading: false,
+          });
+          setActiveStep(1);
+        })();
+
+        // axios({
+        //   method: "post",
+        //   url: "api/validate-clippings",
+        //   data: {
+        //     notionApiAuthToken,
+        //     notionDatabaseID,
+        //     clippingsFile,
+        //     includeCoverImage,
+        //   },
+        // })
+        //   .then(({ data }) => {
+        //     setResult({
+        //       data: data.cleanedClippings,
+        //       error: false,
+        //       loading: false,
+        //     });
+        //     setActiveStep(1);
+        //   })
+        //   .catch((e) => {
+        //     console.error(e);
+        //     setResult({
+        //       data: [],
+        //       error: true,
+        //       loading: false,
+        //     });
+        //   });
       }}
     >
       <Link href="https://thisdot.notion.site/Kindle2Notion-Instructions-0e01105be77a471ba0d559f21e494e08">
@@ -132,6 +153,16 @@ const ValidateForm = ({
       >
         Submit
       </Button>
+      <br />
+      <br />
+      {currentBook !== "" && (
+        <Progress
+          percent={(allTitles.indexOf(currentBook) / allTitles.length) * 100}
+          size="small"
+        >
+          Processing {currentBook}
+        </Progress>
+      )}
     </form>
   );
 };
