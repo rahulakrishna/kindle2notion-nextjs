@@ -51,7 +51,7 @@ type UpdateBookInNotionArgs = {
 };
 
 const updateBookInNotion = async ({
-  notion,
+  notionApiAuthToken,
   notionDatabaseID,
   title,
   author,
@@ -60,44 +60,66 @@ const updateBookInNotion = async ({
   lastHighlightedDate,
   pageId,
 }: UpdateBookInNotionArgs) => {
-  await notion.pages.update({
-    page_id: pageId,
-    properties: {
-      Author: {
-        rich_text: [
-          {
-            text: {
-              content: author,
-            },
-          },
-        ],
-      },
-      "Last Highlighted Date": {
-        rich_text: [
-          {
-            text: {
-              content: lastHighlightedDate,
-            },
-          },
-        ],
+  // call the `/api/update-book-in-notion` endpoint here
+
+  const coverImageURL = coverImage ? coverImage.thumbnail : "";
+  const response = await axios({
+    method: "post",
+    url: "/api/update-book-in-notion",
+    data: {
+      notionApiAuthToken,
+      notionDatabaseID,
+      pageId,
+      book: {
+        title,
+        author,
+        aggregrateText,
+        coverImageURL,
+        lastHighlightedDate,
       },
     },
   });
-  const response = await notion.blocks.children.append({
-    block_id: pageId,
-    children: aggregrateText.map((text: string) => ({
-      object: "block",
-      quote: {
-        rich_text: [
-          {
-            text: {
-              content: text,
-            },
-          },
-        ],
-      },
-    })),
-  });
+
+  return response;
+
+  // await notion.pages.update({
+  //   page_id: pageId,
+  //   properties: {
+  //     Author: {
+  //       rich_text: [
+  //         {
+  //           text: {
+  //             content: author,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     "Last Highlighted Date": {
+  //       rich_text: [
+  //         {
+  //           text: {
+  //             content: lastHighlightedDate,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
+  // const response = await notion.blocks.children.append({
+  //   block_id: pageId,
+  //   children: aggregrateText.map((text: string) => ({
+  //     object: "block",
+  //     quote: {
+  //       rich_text: [
+  //         {
+  //           text: {
+  //             content: text,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   })),
+  // });
 };
 
 const addBookToNotion = async ({
@@ -114,10 +136,17 @@ const addBookToNotion = async ({
   const coverImageURL = coverImage ? coverImage.thumbnail : "";
   const response = await axios({
     method: "post",
-    url: "/add-book-to-notion",
+    url: "/api/add-book-to-notion",
     data: {
       notionApiAuthToken,
       notionDatabaseID,
+      book: {
+        title,
+        author,
+        aggregrateText,
+        coverImageURL,
+        lastHighlightedDate,
+      },
     },
   });
 
@@ -132,7 +161,7 @@ const getTitle = async (
   // dont cry. i'll get you a better solution soon
   const queryTitle = await axios({
     method: "post",
-    url: "/get-title",
+    url: "/api/get-title",
     data: {
       notionApiAuthToken,
       notionDatabaseID,
@@ -164,11 +193,9 @@ async function exportToNotion({
     const { title, author, coverImage } = bookObject;
     setCurrentBook(title);
 
-    const queryTitle = await getTitle(
-      notionDatabaseID,
-      notionApiAuthToken,
-      title
-    );
+    const {
+      data: { queryTitle },
+    } = await getTitle(notionDatabaseID, notionApiAuthToken, title);
 
     console.log({ queryTitle });
     const titleExists = queryTitle.results.length > 0;

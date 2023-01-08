@@ -9,15 +9,14 @@ export default async function handler(
   const {
     notionApiAuthToken,
     notionDatabaseID,
-    title,
-    author,
-    aggregrateText,
-    coverImage,
-    lastHighlightedDate,
+    book: { title, author, aggregrateText, coverImage, lastHighlightedDate },
   } = req.body;
+  console.log({ notionApiAuthToken });
   const notion = new Client({
     auth: notionApiAuthToken,
   });
+
+  console.log({ aggregrateText });
 
   const iconImageURL = coverImage ? coverImage.smallThumbnail : "";
 
@@ -91,5 +90,9 @@ export default async function handler(
       },
     })),
   });
-  return response;
+  console.log({ response });
+
+  res.status(200).json({
+    success: true,
+  });
 }

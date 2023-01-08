@@ -249,6 +249,8 @@ const SubmitForm = ({
                 books: clippingsToSubmit,
                 setCurrentBook,
               });
+              setSubmitted(true);
+              setSubmitting(false);
             })();
             // axios({
             //   method: "post",
@@ -277,7 +279,7 @@ const SubmitForm = ({
         <br />
         <br />
       </Grid>
-      {currentBook !== "" && (
+      {currentBook !== "" && submitting && (
         <Progress
           percent={
             clippingsToSubmit !== undefined
