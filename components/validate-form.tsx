@@ -135,7 +135,6 @@ const ValidateForm = ({
       <br />
       <br />
       <Checkbox
-        disabled
         label="Include Cover Image"
         toggle
         checked={includeCoverImage}
