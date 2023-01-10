@@ -1,4 +1,3 @@
-import axios from "axios";
 import { SyntheticEvent, useState, useEffect, Key } from "react";
 import {
   Button,
@@ -252,32 +251,10 @@ const SubmitForm = ({
               setSubmitted(true);
               setSubmitting(false);
             })();
-            // axios({
-            //   method: "post",
-            //   url: "api/submit-clippings",
-            //   data: {
-            //     notionApiAuthToken,
-            //     notionDatabaseID,
-            //     books: clippingsToSubmit,
-            //   },
-            // })
-            //   .then(({ data }) => {
-            //     setCompleted(true);
-            //     console.log({ data });
-            //     setSubmitted(true);
-            //   })
-            //   .catch((e) => {
-            //     console.error(e);
-            //   })
-            //   .finally(() => {
-            //     setSubmitting(false);
-            //   });
           }}
         >
           {!submitted ? "Upload to Notion" : "Done!"}
         </Button>
-        <br />
-        <br />
       </Grid>
       {currentBook !== "" && submitting && (
         <Progress
