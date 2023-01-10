@@ -227,6 +227,19 @@ const SubmitForm = ({
           c.clippings.some((c) => c.length > 2000)
         ) &&
           "Some of your clippings exceed 2000 characters, the limit set by Notion for a block. Please edit the portions highlighted in red"}
+        {currentBook !== "" && submitting && (
+          <Progress
+            percent={
+              clippingsToSubmit !== undefined
+                ? (clippingsToSubmit?.map((c) => c.title).indexOf(currentBook) /
+                    clippingsToSubmit?.length) *
+                  100
+                : 0
+            }
+          >
+            Adding {currentBook} to Notion
+          </Progress>
+        )}
         <Button
           fluid
           primary={!submitted}
@@ -256,19 +269,8 @@ const SubmitForm = ({
           {!submitted ? "Upload to Notion" : "Done!"}
         </Button>
       </Grid>
-      {currentBook !== "" && submitting && (
-        <Progress
-          percent={
-            clippingsToSubmit !== undefined
-              ? (clippingsToSubmit?.map((c) => c.title).indexOf(currentBook) /
-                  clippingsToSubmit?.length) *
-                100
-              : 0
-          }
-        >
-          Adding {currentBook} to Notion
-        </Progress>
-      )}
+      <br />
+      <br />
     </div>
   );
 };
