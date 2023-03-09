@@ -221,56 +221,88 @@ const SubmitForm = ({
             </Grid.Column>
           );
         })}
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
       </Grid>
-      <Grid style={{ marginBottom: "32px" }}>
-        {clippingsToSubmit?.some((c) =>
-          c.clippings.some((c) => c.length > 2000)
-        ) &&
-          "Some of your clippings exceed 2000 characters, the limit set by Notion for a block. Please edit the portions highlighted in red"}
-        {currentBook !== "" && submitting && (
-          <Progress
-            percent={
-              clippingsToSubmit !== undefined
-                ? (clippingsToSubmit?.map((c) => c.title).indexOf(currentBook) /
-                    clippingsToSubmit?.length) *
-                  100
-                : 0
-            }
-          >
-            Adding {currentBook} to Notion
-          </Progress>
-        )}
-        <Button
-          fluid
-          primary={!submitted}
-          positive={submitted}
-          disabled={
-            !!submitting ||
-            clippingsToSubmit?.some((c) =>
+      <Grid
+        columns={1}
+        style={{
+          width: "70%",
+          paddingBottom: "32px",
+          position: "fixed",
+          bottom: "0px",
+          background: "#fff",
+        }}
+      >
+        <Grid.Column width={12}>
+          <>
+            {clippingsToSubmit?.some((c) =>
               c.clippings.some((c) => c.length > 2000)
-            )
-          }
-          loading={submitting}
-          onClick={() => {
-            setSubmitting(true);
-            console.log({ clippings, clippingsToSubmit, books });
-            (async () => {
-              await submitToNotion({
-                notionApiAuthToken,
-                notionDatabaseID,
-                books: clippingsToSubmit,
-                setCurrentBook,
-              });
-              setSubmitted(true);
-              setSubmitting(false);
-            })();
-          }}
-        >
-          {!submitted ? "Upload to Notion" : "Done!"}
-        </Button>
+            ) &&
+              "Some of your clippings exceed 2000 characters, the limit set by Notion for a block. Please edit the portions highlighted in red"}
+            <Button
+              primary={!submitted}
+              positive={submitted}
+              disabled={
+                !!submitting ||
+                clippingsToSubmit?.some((c) =>
+                  c.clippings.some((c) => c.length > 2000)
+                )
+              }
+              loading={submitting}
+              onClick={() => {
+                setSubmitting(true);
+                console.log({ clippings, clippingsToSubmit, books });
+                (async () => {
+                  await submitToNotion({
+                    notionApiAuthToken,
+                    notionDatabaseID,
+                    books: clippingsToSubmit,
+                    setCurrentBook,
+                  });
+                  setSubmitted(true);
+                  setSubmitting(false);
+                })();
+              }}
+            >
+              {!submitted ? "Upload to Notion" : "Done!"}
+            </Button>
+            <br />
+
+            <Progress
+              style={{
+                visibility:
+                  currentBook !== "" && submitting ? "visible" : "hidden",
+              }}
+              percent={
+                clippingsToSubmit !== undefined
+                  ? (clippingsToSubmit
+                      ?.map((c) => c.title)
+                      .indexOf(currentBook) /
+                      clippingsToSubmit?.length) *
+                    100
+                  : 0
+              }
+            >
+              Adding {currentBook} to Notion
+            </Progress>
+          </>
+        </Grid.Column>
       </Grid>
-      <br />
-      <br />
     </div>
   );
 };

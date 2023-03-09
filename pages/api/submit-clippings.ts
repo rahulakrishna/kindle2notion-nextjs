@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Client } from "@notionhq/client";
+import { Book } from "../../utils/types";
 
 type Data = {
   status: any;
@@ -8,14 +9,6 @@ type Data = {
 
 type Error = {
   message: string;
-};
-
-type Book = {
-  title: string;
-  author: string;
-  clippings: Array<string>;
-  coverImage: { smallThumbnail: string; thumbnail: string } | undefined;
-  lastHighlightedDate: string;
 };
 
 const prepareAggregrateTextForOneBook = (book: Book) => {

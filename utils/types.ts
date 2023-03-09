@@ -21,3 +21,11 @@ export type ClippingsResult = {
   error: boolean | string;
   data: Array<CleanedClipping>;
 };
+
+export type Book = {
+  title: string;
+  author: string;
+  clippings: Array<string>;
+  coverImage: { smallThumbnail: string; thumbnail: string } | undefined;
+  lastHighlightedDate: string;
+};
