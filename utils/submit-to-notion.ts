@@ -131,9 +131,6 @@ const addBookToNotion = async ({
   coverImage,
   lastHighlightedDate,
 }: AddBookToNotionArgs) => {
-  const iconImageURL = coverImage ? coverImage.smallThumbnail : "";
-
-  const coverImageURL = coverImage ? coverImage.thumbnail : "";
   const response = await axios({
     method: "post",
     url: "/api/add-book-to-notion",
@@ -144,7 +141,7 @@ const addBookToNotion = async ({
         title,
         author,
         aggregrateText,
-        coverImageURL,
+        coverImage,
         lastHighlightedDate,
       },
     },

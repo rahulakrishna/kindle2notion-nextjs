@@ -261,7 +261,8 @@ const SubmitForm = ({
                 !!submitting ||
                 clippingsToSubmit?.some((c) =>
                   c.clippings.some((c) => c.length > 2000)
-                )
+                ) ||
+                submitted
               }
               loading={submitting}
               onClick={() => {
